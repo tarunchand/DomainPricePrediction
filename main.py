@@ -246,16 +246,32 @@ def process():
 
 
 def temp():
-    f = open('final_dictionary.txt').read().split('\n')
-    count = 1
-    w = open('new/' + str(count) + '.csv', 'w')
-    w.write('Keyword' + '\n')
-    for i in range(1, len(f)+1):
-        w.write(f[i-1] + '\n')
-        if i%7000 == 0:
+    r = open('final_dictionary.txt').read().split('\n')
+    w = open('dictionary_map.txt', 'w')
+    cache = dict()
+    for i in range(1, 39):
+        file_name = 'data/' + str(i) + '_res.csv'
+        dataset = pd.read_csv(file_name, encoding='utf-16')
+        column = dataset.columns[0]
+        size = len(dataset[column])
+        for j in range(3, size):
+            row = dataset[column][j].split('\t')
+            word = row[0].upper()
+            search_volume = row[3]
+            if search_volume == '':
+                cache[word] = 0
+            else:
+                cache[word] = int(float(search_volume))
+    print(len(cache))
+    count = 0
+    for word in r:
+        res = cache.get(word.upper(), -1)
+        if res == -1:
+            w.write(word + '\n')
+        else:
+            w.write(word + ':' + str(cache[word.upper()]) + '\n')
             count += 1
-            w = open('new/' + str(count) + '.csv', 'w')
-            w.write('Keyword' + '\n')
+    print(count)
 
 
 if __name__ == '__main__':
